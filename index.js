@@ -1,1 +1,1 @@
-console.log("simple crud api");
+const server = require("./src/server");

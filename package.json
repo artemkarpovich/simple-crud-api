@@ -20,5 +20,8 @@
   "homepage": "https://github.com/artemkarpovich/simple-crud-api#readme",
   "devDependencies": {
     "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "dotenv": "^10.0.0"
   }
 }
