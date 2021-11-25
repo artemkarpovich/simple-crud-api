@@ -1,6 +1,7 @@
+const { validate } = require("uuid");
 const { HTTP_STATUS_CODES } = require("../constants");
 const { ValidationError, DBError } = require("../errors");
-const { handleReqData } = require("../utils");
+const { handleReqData, splitUrl } = require("../utils");
 const personService = require("./service");
 const validateBody = require("./validateBody");
 
@@ -78,7 +79,7 @@ async function createPerson(req, res) {
 
 async function updatedPerson(req, res) {
   try {
-    const [, uuid] = splitedUrl;
+    const [, uuid] = splitUrl(req.url);
     const isValidUuid = validate(uuid);
 
     if (!isValidUuid) {
