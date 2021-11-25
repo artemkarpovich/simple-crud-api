@@ -23,7 +23,13 @@ function normalizeUrl(url) {
   return url.endsWith("/") ? url.slice(0, -1) : url;
 }
 
+function splitUrl(url) {
+  console.log(url, "URL URK");
+  return url.split("/").slice(1);
+}
+
 module.exports = {
   handleReqData,
   normalizeUrl,
+  splitUrl,
 };

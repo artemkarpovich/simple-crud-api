@@ -47,21 +47,20 @@ function deletePerson(id) {
   });
 }
 
-function updatePerson(id, person) {
+function updatePerson(id, { age, name, hobbies }) {
   return new Promise((resolve, reject) => {
     const person = data.find((person) => person.id === id);
-
-    const fullPerson = { id, ...person };
 
     if (!person) {
       reject(new DBError(`No person with ${id} found`));
     }
 
     const personIndex = data.findIndex((person) => person.id === id);
+    const updatedPerson = { id: person.id, age, name, hobbies };
 
-    data = [...data.slice(0, personIndex), fullPerson, ...data.slice(personIndex + 1)];
+    data.splice(personIndex, 1, updatedPerson);
 
-    resolve(fullPerson);
+    resolve(updatedPerson);
   });
 }
 
