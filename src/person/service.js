@@ -1,67 +1,71 @@
 const { v4 } = require("uuid");
 const data = require("../db");
 
-const personService = {
-  getPersons() {
-    return new Promise((resolve) => resolve(data));
-  },
+function getPersons() {
+  return new Promise((resolve) => resolve(data));
+}
 
-  getPerson(id) {
-    return new Promise((resolve, reject) => {
-      const person = data.find((person) => person.id === id);
+function getPerson(id) {
+  return new Promise((resolve, reject) => {
+    const person = data.find((person) => person.id === id);
 
-      if (!person) {
-        reject(`Person for ${id} wasn't found`);
-      }
+    if (!person) {
+      reject(new Error(`Person for ${id} wasn't found`));
+    }
 
-      resolve(person);
-    });
-  },
+    resolve(person);
+  });
+}
 
-  createPerson(person) {
-    return new Promise((resolve) => {
-      const newPerson = {
-        id: v4(),
-        ...person,
-      };
+function createPerson(person) {
+  return new Promise((resolve) => {
+    const newPerson = {
+      id: v4(),
+      ...person,
+    };
 
-      data.push(newPerson);
+    data.push(newPerson);
 
-      resolve(newPerson);
-    });
-  },
+    resolve(newPerson);
+  });
+}
 
-  deletePerson(id) {
-    return new Promise((resolve, reject) => {
-      const person = data.find((person) => person.id === id);
+function deletePerson(id) {
+  return new Promise((resolve, reject) => {
+    const person = data.find((person) => person.id === id);
 
-      if (!person) {
-        reject(`No person with ${id} found`);
-      }
+    if (!person) {
+      reject(`No person with ${id} found`);
+    }
 
-      data = data.filter((person) => person.id !== id);
+    data = data.filter((person) => person.id !== id);
 
-      resolve(person);
-    });
-  },
+    resolve(person);
+  });
+}
 
-  updatePerson(id, person) {
-    return new Promise((resolve, reject) => {
-      const person = data.find((person) => person.id === id);
+function updatePerson(id, person) {
+  return new Promise((resolve, reject) => {
+    const person = data.find((person) => person.id === id);
 
-      const fullPerson = { id, ...person };
+    const fullPerson = { id, ...person };
 
-      if (!person) {
-        reject(`No person with ${id} found`);
-      }
+    if (!person) {
+      reject(`No person with ${id} found`);
+    }
 
-      const personIndex = data.findIndex((person) => person.id === id);
+    const personIndex = data.findIndex((person) => person.id === id);
 
-      data = [...data.slice(0, personIndex), fullPerson, ...data.slice(personIndex + 1)];
+    data = [...data.slice(0, personIndex), fullPerson, ...data.slice(personIndex + 1)];
 
-      resolve(fullPerson);
-    });
-  },
+    resolve(fullPerson);
+  });
+}
+
+module.exports = {
+  getPersons,
+  getPerson,
+  createPerson,
+  deletePerson,
+  updatePerson,
 };
-
-module.exports = personService;
