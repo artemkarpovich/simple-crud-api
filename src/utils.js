@@ -24,8 +24,7 @@ function normalizeUrl(url) {
 }
 
 function splitUrl(url) {
-  console.log(url, "URL URK");
-  return url.split("/").slice(1);
+  return normalizeUrl(url).split("/").slice(1);
 }
 
 module.exports = {
