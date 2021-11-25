@@ -1,4 +1,4 @@
-const { randomUUID } = require("crypto");
+const { v4 } = require("uuid");
 const data = require("../db");
 
 const personService = {
@@ -21,7 +21,7 @@ const personService = {
   createPerson(person) {
     return new Promise((resolve) => {
       const newPerson = {
-        id: randomUUID(),
+        id: v4(),
         ...person,
       };
 

@@ -1,14 +1,14 @@
-const { randomUUID } = require("crypto");
+const { v4 } = require("uuid");
 
 let persons = [
   {
-    id: randomUUID(),
+    id: v4(),
     name: "Vasya",
     age: 18,
     hobbies: ["football", "playing table game"],
   },
   {
-    id: randomUUID(),
+    id: v4(),
     name: "Lisa",
     age: 27,
     hobbies: ["travelling", "cooking"],
