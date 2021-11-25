@@ -41,7 +41,9 @@ function deletePerson(id) {
       reject(new DBError(`No person with ${id} found`));
     }
 
-    data = data.filter((person) => person.id !== id);
+    const personIndex = data.findIndex((person) => person.id === id);
+
+    data.splice(personIndex, 1);
 
     resolve(person);
   });

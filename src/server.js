@@ -104,6 +104,32 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: error.message }));
     }
+  } else if (req.method === HTTP_METHODS.DELETE && normalizedUrl.includes("/person/") && splitedUrl.length === 2) {
+    try {
+      const [, uuid] = splitedUrl;
+      const isValidUuid = validate(uuid);
+
+      if (!isValidUuid) {
+        throw new ValidationError("Passed uuid ins't valid");
+      }
+
+      const removePerson = await personService.deletePerson(uuid);
+      res.writeHead(HTTP_STATUS_CODES.NOT_FOUND, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, data: removePerson }));
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        res.writeHead(HTTP_STATUS_CODES.BAD_REQUEST, { "Content-Type": "application/json" });
+        return res.end(JSON.stringify({ error: error.message }));
+      }
+
+      if (error instanceof DBError) {
+        res.writeHead(HTTP_STATUS_CODES.NOT_FOUND, { "Content-Type": "application/json" });
+        return res.end(JSON.stringify({ error: error.message }));
+      }
+
+      res.writeHead(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: error.message }));
+    }
   } else {
     res.writeHead(HTTP_STATUS_CODES.NOT_FOUND, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "Route not found" }));
