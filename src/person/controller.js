@@ -1,7 +1,12 @@
 const { validate } = require("uuid");
 const { HTTP_STATUS_CODES } = require("../constants");
-const { ValidationError, DBError } = require("../errors");
-const { handleReqData, splitUrl } = require("../utils");
+const { ValidationError } = require("../errors");
+const {
+  handleReqData,
+  splitUrl,
+  handleResponse,
+  handleError,
+} = require("../utils");
 const personService = require("./service");
 const validateBody = require("./validateBody");
 
@@ -9,19 +14,11 @@ async function getPersons(req, res) {
   try {
     const persons = await personService.getPersons();
 
-    res.writeHead(HTTP_STATUS_CODES.OK, { "Content-Type": "application/json" });
-    res.end(
-      JSON.stringify({
-        data: persons,
-      })
-    );
+    handleResponse(res, HTTP_STATUS_CODES.OK, {
+      data: persons,
+    });
   } catch (error) {
-    res.writeHead(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, { "Content-Type": "application/json" });
-    res.end(
-      JSON.stringify({
-        error: "Something went wrong.",
-      })
-    );
+    handleError(res, error);
   }
 }
 
@@ -35,45 +32,24 @@ async function getPerson(req, res) {
     }
 
     const person = await personService.getPerson(uuid);
-    res.writeHead(HTTP_STATUS_CODES.OK, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ data: person }));
+
+    handleResponse(res, HTTP_STATUS_CODES.OK, { data: person });
   } catch (error) {
-    if (error instanceof ValidationError) {
-      res.writeHead(HTTP_STATUS_CODES.BAD_REQUEST, { "Content-Type": "application/json" });
-      return res.end(JSON.stringify({ error: error.message }));
-    }
-
-    if (error instanceof DBError) {
-      res.writeHead(HTTP_STATUS_CODES.NOT_FOUND, { "Content-Type": "application/json" });
-      return res.end(JSON.stringify({ error: error.message }));
-    }
-
-    res.writeHead(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ error: "Something went wrong." }));
+    handleError(res, error);
   }
 }
 
 async function createPerson(req, res) {
   try {
     const body = await handleReqData(req);
+
     validateBody(body);
+
     const newPerson = await personService.createPerson(body);
 
-    res.writeHead(HTTP_STATUS_CODES.CREATED, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ data: newPerson }));
+    handleResponse(res, HTTP_STATUS_CODES.CREATED, { data: newPerson });
   } catch (error) {
-    if (error instanceof ValidationError) {
-      res.writeHead(HTTP_STATUS_CODES.BAD_REQUEST, { "Content-Type": "application/json" });
-      return res.end(JSON.stringify({ error: error.message }));
-    }
-
-    if (error instanceof DBError) {
-      res.writeHead(HTTP_STATUS_CODES.NOT_FOUND, { "Content-Type": "application/json" });
-      return res.end(JSON.stringify({ error: error.message }));
-    }
-
-    res.writeHead(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ error: "Something went wrong." }));
+    handleError(res, error);
   }
 }
 
@@ -90,49 +66,27 @@ async function updatedPerson(req, res) {
     validateBody(body);
 
     const updatedPerson = await personService.updatePerson(uuid, body);
-    res.writeHead(HTTP_STATUS_CODES.OK, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ data: updatedPerson }));
+
+    handleResponse(res, HTTP_STATUS_CODES.OK, { data: updatedPerson });
   } catch (error) {
-    if (error instanceof ValidationError) {
-      res.writeHead(HTTP_STATUS_CODES.BAD_REQUEST, { "Content-Type": "application/json" });
-      return res.end(JSON.stringify({ error: error.message }));
-    }
-
-    if (error instanceof DBError) {
-      res.writeHead(HTTP_STATUS_CODES.NOT_FOUND, { "Content-Type": "application/json" });
-      return res.end(JSON.stringify({ error: error.message }));
-    }
-
-    res.writeHead(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ error: "Something went wrong." }));
+    handleError(res, error);
   }
 }
 
 async function deletePerson(req, res) {
   try {
-    const [, uuid] = splitedUrl;
+    const [, uuid] = splitUrl(req.url);
     const isValidUuid = validate(uuid);
 
     if (!isValidUuid) {
       throw new ValidationError("Passed uuid ins't valid");
     }
 
-    const removePerson = await personService.deletePerson(uuid);
-    res.writeHead(HTTP_STATUS_CODES.NOT_FOUND, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ success: true, data: removePerson }));
+    const removedPerson = await personService.deletePerson(uuid);
+
+    handleResponse(res, HTTP_STATUS_CODES.OK, { data: removedPerson });
   } catch (error) {
-    if (error instanceof ValidationError) {
-      res.writeHead(HTTP_STATUS_CODES.BAD_REQUEST, { "Content-Type": "application/json" });
-      return res.end(JSON.stringify({ error: error.message }));
-    }
-
-    if (error instanceof DBError) {
-      res.writeHead(HTTP_STATUS_CODES.NOT_FOUND, { "Content-Type": "application/json" });
-      return res.end(JSON.stringify({ error: error.message }));
-    }
-
-    res.writeHead(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ error: "Something went wrong." }));
+    handleError(res, error);
   }
 }
 

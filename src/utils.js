@@ -1,4 +1,6 @@
 const { ValidationError } = require("./errors");
+const { HTTP_STATUS_CODES } = require("./constants");
+const { DBError } = require("./errors");
 
 function handleReqData(req) {
   return new Promise((resolve, reject) => {
@@ -27,8 +29,33 @@ function splitUrl(url) {
   return normalizeUrl(url).split("/").slice(1);
 }
 
+function handleResponse(res, statusCode, data) {
+  res.writeHead(statusCode, { "Content-Type": "application/json" });
+  res.end(JSON.stringify(data));
+}
+
+function handleError(res, error) {
+  if (error instanceof ValidationError) {
+    return handleResponse(res, HTTP_STATUS_CODES.BAD_REQUEST, {
+      error: error.message,
+    });
+  }
+
+  if (error instanceof DBError) {
+    return handleResponse(res, HTTP_STATUS_CODES.NOT_FOUND, {
+      error: error.message,
+    });
+  }
+
+  handleResponse(res, HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, {
+    error: "Something went wrong.",
+  });
+}
+
 module.exports = {
   handleReqData,
   normalizeUrl,
   splitUrl,
+  handleResponse,
+  handleError,
 };
