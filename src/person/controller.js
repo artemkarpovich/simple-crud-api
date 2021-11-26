@@ -84,7 +84,7 @@ async function deletePerson(req, res) {
 
     const removedPerson = await personService.deletePerson(uuid);
 
-    handleResponse(res, HTTP_STATUS_CODES.OK, { data: removedPerson });
+    handleResponse(res, HTTP_STATUS_CODES.NO_CONTENT, { data: removedPerson });
   } catch (error) {
     handleError(res, error);
   }
