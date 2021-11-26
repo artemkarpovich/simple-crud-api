@@ -1,6 +1,5 @@
-const { ValidationError } = require("./errors");
+const { ValidationError, DBError } = require("./errors");
 const { HTTP_STATUS_CODES } = require("./constants");
-const { DBError } = require("./errors");
 
 function handleReqData(req) {
   return new Promise((resolve, reject) => {
