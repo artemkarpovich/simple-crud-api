@@ -90,10 +90,17 @@ async function deletePerson(req, res) {
   }
 }
 
+function handleNotFound(_, res) {
+  handleResponse(res, HTTP_STATUS_CODES.NOT_FOUND, {
+    error: "Route not found",
+  });
+}
+
 module.exports = {
   getPersons,
   getPerson,
   createPerson,
   updatedPerson,
   deletePerson,
+  handleNotFound,
 };

@@ -29,6 +29,13 @@ function splitUrl(url) {
   return normalizeUrl(url).split("/").slice(1);
 }
 
+function isCorrectUrl(url) {
+  const normalizedUrl = normalizeUrl(url);
+  const splitedUrl = splitUrl(url);
+
+  return normalizedUrl.includes("/person/") && splitedUrl.length === 2;
+}
+
 function handleResponse(res, statusCode, data) {
   res.writeHead(statusCode, { "Content-Type": "application/json" });
   res.end(JSON.stringify(data));
@@ -58,4 +65,5 @@ module.exports = {
   splitUrl,
   handleResponse,
   handleError,
+  isCorrectUrl,
 };
